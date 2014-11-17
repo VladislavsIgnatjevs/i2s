@@ -1,4 +1,27 @@
-<h1>Images#index</h1>
-<p>Find me in app/views/images/index.html.erb</p>
-
+<h1>List of all images</h1>
+<table>
+  <% @images.each do |image| %>
+      <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+        <td>
+          <%= image_tag(image.image_url, class: 'list_image') %>
+        </td>
+        <td class="list_description">
+          <dl>
+            <dt><%= image.title %></dt>
+            <dd><%= truncate(strip_tags(image.description), length: 80) %></dd>
+            <dt><%= image.category %> </dt>
+            <dt><%= image.voice_url %> </dt>
+          </dl>
+        </td>
+        <td class="list_actions">
+          <%= link_to 'Show', image %>
+          <br/>
+          <%= link_to 'Edit', edit_image_path(image) %>
+          <br/>
+          <%= link_to 'Destroy', image, method: :delete,
+                      data: {confirm: 'Are you sure?'} %>
+        </td>
+      </tr>
+  <% end %>
+</table>
 <%= link_to 'New Image', images_new_url %>
