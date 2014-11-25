@@ -2,10 +2,10 @@
 class Image
   include Cequel::Record
 
-  key :id, :uuid, auto: true
-  column :title, :varchar
+  key :id, :varchar  #SHA1 checksum
   column :description, :text
   column :category, :varchar
-  column :image_url, :varchar
-  column :voice_url, :varchar
+  column :voice_id, :uuid
+  column :voice_id2, :uuid
 end
+
