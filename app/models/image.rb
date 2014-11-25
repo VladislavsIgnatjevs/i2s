@@ -6,6 +6,5 @@ class Image
   column :description, :text
   column :category, :varchar
   column :voice_id, :uuid
-  column :voice_id2, :uuid
 end
 
