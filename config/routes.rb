@@ -12,6 +12,9 @@ Rails.application.routes.draw do
 
   get 'images/edit'
 
+  resources :say_hello
+  resources :tts
+  #get 'say_hello' => 'say_hello#say_hello'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
