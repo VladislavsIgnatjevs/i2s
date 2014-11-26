@@ -1,13 +1,42 @@
 class ImagesController < ApplicationController
   before_action :set_image, only: [:show, :edit]
-
+  include ImageToText;
+  include CacheKnowledge;
 
   def index
-    @images = Image.all
+
+    require 'unirest'
+
+
+
+
+
+    img_url = params[:imgurl];
+    response = Unirest.get 'http://' + img_url
+
+
+    img_hash =  Digest::SHA1.hexdigest response.body
+    cached_img = Image.find_by_id(img_hash)
+
+    if (cached_img != nil)
+      render :text =>cached_img.description
+    else
+      #for thesting purposes I pass the whole blob. In the final version we will pass the url of the image for the google.
+      description = convertImageToText(response.body);
+      cache_it_async({"id" => img_hash, "category" => nil, "description" => description, "voice_id" => nil })
+      render :text =>description
+    end
+
+
+
+
+
+
+
   end
 
   def new
-    @image = Image.new
+      @image = Image.new
   end
 
   def create
