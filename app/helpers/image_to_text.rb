@@ -30,7 +30,7 @@ module ImageToText
     require 'json'
 
 
-    #sending the image to googgle. Note th
+    #sending the image to google. Note th
     response = Unirest.post "http://www.google.co.uk/searchbyimage/upload",
                             headers:{ "Accept" => "application/json" },
                             parameters:{ :encoded_image => File.new("image.jpg", 'rb')}
@@ -42,7 +42,7 @@ module ImageToText
     link = response.body[index1, index2-index1]
 
 
-    #send the html query to the link we got from the prewious answer
+    #send the html query to the link we got from the previous answer
     response = Unirest.get 'http:' + link
 
 
@@ -57,7 +57,7 @@ module ImageToText
     end
 
 
-    #if there is no such clear match google offers some pages where similat image can be found.
+    #if there is no such clear match google offers some pages where similar image can be found.
     #we dont need it. We want to go the the similar images page where every similar image can
     #be found with the title and the description. I dig the link to this page out here.
     similar_index = response.body.index('<div class="_Icb _kk _wI">')
@@ -80,7 +80,7 @@ module ImageToText
     #start building a json object from the descriptions in the html response
     descriptions = '{"images":['
 
-    #after this we can find all information of one similat image.
+    #after this we can find all information of one similar image.
     next_description_index = response.body.index('<div class="rg_meta">')
 
     #iterate the pictures in the html file

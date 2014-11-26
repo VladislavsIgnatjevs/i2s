@@ -1,0 +1,14 @@
+#Description of the picture generated using noun with the the sentence around, which according to english
+#language rules has to be with the Indefinite and Definite Articles + if there is a name(starts with uppercase) then no
+#article will be used.
+
+module DescriptionTextExport
+
+  def Construct(text)
+
+  end
+
+end
+
+
+
