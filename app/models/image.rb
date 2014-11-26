@@ -6,5 +6,8 @@ class Image
   column :description, :text
   column :category, :varchar
   column :voice_id, :uuid
+  column :processed_description, :text
+
 end
+
 

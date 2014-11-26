@@ -1,7 +1,7 @@
 # -*- encoding : utf-8 -*-
 class Noun
   include Cequel::Record
-
-  key :id, :text
+  key :id, :varchar
+  column :noun, :text
 end
 

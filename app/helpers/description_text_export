@@ -12,33 +12,51 @@ module DescriptionTextExport
 
 
 
-  def construct
-    #here access should get through the db to NOUN
-    @noun = Noun.find(params[:id])
+  def construct(text)
+    #here noun is received through the parameter "text"
+    #sure this is not working yet
+    @noun = text
 
     #check if the word starts with vovels
     if @noun.start_with?('a','e','i','o','u')
-      puts 'There is an ',@noun,' in this picture'
-      #still need to do output to the description
+      #output to terminal
+      puts "There is an #{@noun} in this picture"
+
+      #not sure if works, maybe need to make prepared statement
+      @word = Image.find(params[:id])
+      @word.update_attributes!(processed_description: "There is an #{@noun} in this picture")
+
+
 
 
     #check if word starts with consonants and does not contain uppercase letters
     else if !(@noun.start_with?('a','e','i','o','u','y')) && checkUpper==false
 
-           puts 'There is a ',@noun,' in this picture'
-           #still need to do output to the description
+           #output to terminal
+           puts "There is a #{@noun} in this picture"
+
+           #not sure if works, maybe need to make prepared statement
+           @word = Image.find(params[:id])
+           @word.update_attributes!(processed_description: "There is a #{@noun} in this picture")
 
 
     #check if word starts with uppercase vovels
     else if @noun.start_with?('A','E','I','O','U','Y')
-           puts 'There is ',@noun,' in this picture'
-           #still need to do output to the description
+
+           #output to terminal
+           puts "There is #{@noun} in this picture"
+           #not sure if works, maybe need to make prepared statement
+           @word = Image.find(params[:id])
+           @word.update_attributes!(processed_description: "There is #{@noun} in this picture")
 
     #check if word starts with uppercase consonants
-         else if !(@noun.start_with?('A','E','I','O','U','Y')) && checkUpper==true
+    else if !(@noun.start_with?('A','E','I','O','U','Y')) && checkUpper==true
 
-           puts 'There is ',@noun,' in this picture'
-           #still need to do output to the description
+           #output to terminal
+           puts "There is #{@noun} in this picture"
+           #not sure if works, maybe need to make prepared statement
+           @word = Image.find(params[:id])
+           @word.update_attributes!(processed_description: "There is #{@noun} in this picture")
 
 
 
