@@ -21,7 +21,7 @@ class ImagesController < ApplicationController
     if (cached_img != nil)
       render :text =>cached_img.description
     else
-      #for thesting purposes I pass the whole blob. In the final version we will pass the url of the image for the google.
+      #for testing purposes I pass the whole blob. In the final version we will pass the url of the image for the google.
       description = convertImageToText(response.body);
       cache_it_async({"id" => img_hash, "category" => nil, "description" => description, "voice_id" => nil })
       render :text =>description
