@@ -38,8 +38,8 @@ module DescriptionTextExport
       puts "There is an #{@noun} in this picture"
 
       #not sure if works, maybe need to make prepared statement
-      @word = Image.find(params[:id])
-      @word.update_attributes!(processed_description: "There is an #{@noun} in this picture")
+
+      return "There is an #{@noun} in this picture"
 
 
 
@@ -51,8 +51,8 @@ module DescriptionTextExport
            puts "There is a #{@noun} in this picture"
 
            #not sure if works, maybe need to make prepared statement
-           @word = Image.find(params[:id])
-           @word.update_attributes!(processed_description: "There is a #{@noun} in this picture")
+
+           return "There is a #{@noun} in this picture"
 
 
     #check if word starts with uppercase vovels and is of singular form
@@ -61,8 +61,8 @@ module DescriptionTextExport
            #output to terminal
            puts "There is #{@noun} in this picture"
            #not sure if works, maybe need to make prepared statement
-           @word = Image.find(params[:id])
-           @word.update_attributes!(processed_description: "There is #{@noun} in this picture")
+
+           return "There is #{@noun} in this picture"
 
     #check if word starts with uppercase consonants and is of singular form
     else if !(@noun.start_with?('A','E','I','O','U','Y')) && checkUpper==true && test_singularity(@noun)==true
@@ -70,20 +70,21 @@ module DescriptionTextExport
            #output to terminal
            puts "There is #{@noun} in this picture"
            #not sure if works, maybe need to make prepared statement
-           @word = Image.find(params[:id])
-           @word.update_attributes!(processed_description: "There is #{@noun} in this picture")
+
+           return "There is #{@noun} in this picture"
 
 
       #FOR PLURAL FORM WORDS
 
       #check if the word starts with vovels and is of singular form
+
            if @noun.start_with?('a','e','i','o','u') && test_singularity(@noun)==false
              #output to terminal
              puts "There is an #{@noun} in this picture"
 
              #not sure if works, maybe need to make prepared statement
-             @word = Image.find(params[:id])
-             @word.update_attributes!(processed_description: "There are #{@noun} in this picture")
+
+             return "There are #{@noun} in this picture"
 
 
 
@@ -95,9 +96,9 @@ module DescriptionTextExport
                   puts "There are #{@noun} are this picture"
 
                   #not sure if works, maybe need to make prepared statement
-                  @word = Image.find(params[:id])
 
-                  @word.update_attributes!(processed_description: "There are a #{@noun} in this picture")
+
+                  return "There are a #{@noun} in this picture"
 
 
               #check if word starts with uppercase vovels and is of plural form
@@ -106,8 +107,8 @@ module DescriptionTextExport
                        #output to terminal
                        puts "There are #{@noun} in this picture"
                        #not sure if works, maybe need to make prepared statement
-                       @word = Image.find(params[:id])
-                       @word.update_attributes!(processed_description: "There are #{@noun} in this picture")
+
+                       return "There are #{@noun} in this picture"
 
                     #check if word starts with uppercase consonants and is of singular form
                      else if !(@noun.start_with?('A','E','I','O','U','Y')) && checkUpper==true && test_singularity(@noun)==false
@@ -115,8 +116,8 @@ module DescriptionTextExport
                             #output to terminal
                             puts "There are #{@noun} in this picture"
                             #not sure if works, maybe need to make prepared statement
-                            @word = Image.find(params[:id])
-                            @word.update_attributes!(processed_description: "There are #{@noun} in this picture")
+
+                            return "There are #{@noun} in this picture"
 
 
 
