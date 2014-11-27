@@ -3,7 +3,6 @@ module ImageToText
   def convertImageToText(img_blob)
 
 
-
     #writting to the blob to a file to be able to send it. Still need to be fixed so we dont need to save it to
     #a file but send the blob directly.
     open('image.jpg', 'wb') do |file|
@@ -24,7 +23,7 @@ module ImageToText
 =end
 
     require 'unirest'
-
+    require 'engtagger'
     require "net/http"
     require "uri"
     require 'json'
@@ -32,8 +31,8 @@ module ImageToText
 
     #sending the image to google. Note th
     response = Unirest.post "http://www.google.co.uk/searchbyimage/upload",
-                            headers:{ "Accept" => "application/json" },
-                            parameters:{ :encoded_image => File.new("image.jpg", 'rb')}
+                            headers: {"Accept" => "application/json"},
+                            parameters: {:encoded_image => File.new("image.jpg", 'rb')}
 
 
     #the response containes a link where the searching result can be found. I grab it from the answer.
@@ -44,7 +43,6 @@ module ImageToText
 
     #send the html query to the link we got from the previous answer
     response = Unirest.get 'http:' + link
-
 
 
     #If the google finds a very accurate match it gives a hint which word should be used in the searchbar to
@@ -66,7 +64,7 @@ module ImageToText
     if similar_index != nil
       similar_pos1 = response.body.index('href="', similar_index)+6
       similar_pos2 = response.body.index('">', similar_pos1)
-      similar_url = response.body[similar_pos1,similar_pos2-similar_pos1]
+      similar_url = response.body[similar_pos1, similar_pos2-similar_pos1]
     end
 
     #for some reason the response contains the html code for &. I need to change it back in order to have the link work
@@ -75,7 +73,6 @@ module ImageToText
 
     #send the last http query to google to get the page with the similat images and names and descriptions.
     response = Unirest.get 'http://www.google.com' + similar_url
-
 
 
     #start building a json object from the descriptions in the html response
@@ -88,7 +85,7 @@ module ImageToText
     while next_description_index != nil
       next_description_index += 21
       description_end_index = response.body.index('</div>', next_description_index)
-      descriptions += response.body[next_description_index,description_end_index-next_description_index] + ','
+      descriptions += response.body[next_description_index, description_end_index-next_description_index] + ','
 
       #if nil then no more pic
       next_description_index = response.body.index('<div class="rg_meta">', next_description_index+1)
@@ -98,7 +95,7 @@ module ImageToText
     descriptions += ']}'
 
     data = JSON.parse(descriptions)
-    words = Array.new
+    words = ""
 
 
     #this was the very moment when I totally fell in love with ruby. It would be even longer to describe in
@@ -111,62 +108,66 @@ module ImageToText
     similar_img_ids = Array.new
     data['images'].each do |img|
       similar_img_ids.push(img['id'])
-      [img['fn'], img['pt']].each {|str|
-        ['-' ,'>' ,'<','(',')','/', '_' , ',' , '.' , '@', '–', '|', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].each {|replacement| str.gsub!(replacement, ' ')}
+      [img['fn'], img['pt']].each { |str|
+        ['-', 'blue', 'jpg', 'are', 'png', 'gif', '>', '<', '(', ')', '/', '_', ',', '.', '@', '–', '|', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].each { |replacement| str.gsub!(replacement, ' ') }
         str.gsub!(/[[:upper:]][[:lower:]]/, ' \0') # So awesome I almost cried
-        str.split(' ').each {|word|
-          if ((word.downcase != nil)&&(word != '')&&(word != ' '))
-            words.push(word.downcase);
+        str.split(' ').each { |word|
+          if ((word.downcase != nil)&&(word != '')&&(word != ' ')&&(word.length > 2))
+            words += word.downcase + " ";
           end
         }
       }
     end
 
+      # creating an object of tagger
+      tgr = EngTagger.new
+      # Adding tags to every word
+      tagged = tgr.add_tags(words)
 
-    #building a frequency map for each word. it stores the word as a key and the frequency as a value
-    # word=>frequency
-    words_frequency_map = {}
-    words.each { |i| words_frequency_map.include?(i) ? words_frequency_map[i] += 1 : words_frequency_map[i] = 1}
+      adjs = tgr.get_adjectives(tagged)
+      nouns = tgr.get_nouns(tagged)
 
-
-
-
-    #Sometimes different words should be the same. like 10 room, 5 rooms, 9 bedroom should be 24 room at the end
-    #so I add the appropriate frequencies to the appropriate words.
-    words_frequency_map.each{|key_1, fequency_1|
-      words_frequency_map.each{|key_2, fequency_2|
-        words_frequency_map[key_1] += words_frequency_map[key_2]  if ((key_2.include? key_1))
+      #Sometimes different words should be the same. like 10 room, 5 rooms, 9 bedroom should be 24 room at the end
+      #so I add the appropriate frequencies to the appropriate words.
+=begin nouns.each{|key_1, fequency_1|
+        nouns.each{|key_2, fequency_2|
+          nouns[key_1] += nouns[key_2] if ((key_2.include? key_1))
+        }
       }
-    }
+=end
 
-
-
-    nounlist=File.open('nounlist').read
-    nounlist.gsub!(/\r\n?/, '\n')
-
-
-    #words need to be validated. The answer can only ba a word included by out list
-    words_frequency_map_valid ={}
-    nounlist.each_line{|noun|
-      noun.gsub!("\n","")
-      words_frequency_map.each {|word, fequency_2|
-        if ((word.include? noun)||(word == noun))
-          words_frequency_map_valid.merge!(word => words_frequency_map[word])
+    # Add Colours from nouns from adjectives
+       nouns.each{|noun, frequency|
+        if ["white", "black", "red", "yellow", "green", "blue", "green", "pink", "grey", "purple"].include? noun
+          adjs[noun] = frequency
+          nouns[noun] = 0
         end
       }
-    }
+
+      most_frequent_noun = nouns.max_by { |k, v| v }
+
+      puts most_frequent_noun
+
+     # most_frequent_noun.each do |key, value|
+      #  puts key + ' : ' + value
+      #end
+
+      verbs = tgr.get_base_present_verbs(tagged)
+      verbs = verbs.merge(tgr.get_infinitive_verbs(tagged))
+      most_frequent_verb = verbs.max_by { |k, v| v }
+    puts most_frequent_verb
+
+
+      most_frequent_adj = adjs.max_by { |k, v| v }
+    puts most_frequent_adj
+
+    return {"description" => most_frequent_noun[0], "verb" => most_frequent_verb[0], "adj" => most_frequent_adj[0]}
+
+
+    end
 
 
 
-    return {"description" => words_frequency_map_valid.max_by { |k, v| v }[0], "similar_ids" => similar_img_ids}
 
 
-
-
-
-
-  end
-
-
-
-  end
+end
