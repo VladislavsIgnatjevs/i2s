@@ -14,3 +14,9 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym 'RESTful'
 # end
+
+#27.11.14 added rule here to deal with complex pluralizing and singularizing, such as ADDRESS
+
+   ActiveSupport::Inflector.inflections do |inflect|
+     inflect.singular(/ess$/i, 'ess')
+    end

@@ -20,6 +20,16 @@ module DescriptionTextExport
     #sure this is not working yet
     @noun = text
 
+#Will need to think about adding rules for proper linguistics, as now the methods for pluralizing and singularizing
+#are not working with complex words like dresses, which by converting to singular will output DRESSE, but converting
+#dress to plural most likely will output DRESSS
+
+#to solve that need to add to the file: config/initializers/inflections.rb
+#    ActiveSupport::Inflector.inflections do |inflect|
+#      inflect.singular(/ess$/i, 'ess')
+#    end
+#p.s. added changes to the file now.
+
 #FOR SINGULAR FORM WORDS
 
     #check if the word starts with vovels and is of singular form
@@ -86,6 +96,7 @@ module DescriptionTextExport
 
                   #not sure if works, maybe need to make prepared statement
                   @word = Image.find(params[:id])
+
                   @word.update_attributes!(processed_description: "There are a #{@noun} in this picture")
 
 
