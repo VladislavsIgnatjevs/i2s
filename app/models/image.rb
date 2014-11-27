@@ -4,10 +4,7 @@ class Image
 
   key :id, :varchar  #SHA1 checksum
   column :description, :text
-  column :category, :varchar
-  column :voice_id, :uuid
-  column :processed_description, :text
-
+  column :verb, :text
+  column :adj, :text
 end
-
 

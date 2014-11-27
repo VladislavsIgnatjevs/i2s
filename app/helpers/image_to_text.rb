@@ -46,6 +46,7 @@ module ImageToText
     response = Unirest.get 'http:' + link
 
 
+
     #If the google finds a very accurate match it gives a hint which word should be used in the searchbar to
     #find similar images. If it exists I return with that fraze so we can us it.
     guess_index = response.body.index('Best guess for this image:')
@@ -53,7 +54,7 @@ module ImageToText
     if guess_index != nil
       guess_pos1 = response.body.index(">", guess_index)+1
       guess_pos2 = response.body.index('</', guess_pos1)
-      return response.body[guess_pos1,guess_pos2-guess_pos1]
+      #return response.body[guess_pos1,guess_pos2-guess_pos1]
     end
 
 
@@ -105,7 +106,11 @@ module ImageToText
     #Then searches for an uppercase-lowercase pattern cause some times ImageNamesWrittenInThisWay and need
     #to separate these words with a space. then divide everything to words and attache to the word array.
     #And the winner is ruby cause the description is longer :)
+
+    #render :text =>data['images']
+    similar_img_ids = Array.new
     data['images'].each do |img|
+      similar_img_ids.push(img['id'])
       [img['fn'], img['pt']].each {|str|
         ['-' ,'>' ,'<','(',')','/', '_' , ',' , '.' , '@', '–', '|', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].each {|replacement| str.gsub!(replacement, ' ')}
         str.gsub!(/[[:upper:]][[:lower:]]/, ' \0') # So awesome I almost cried
@@ -152,7 +157,8 @@ module ImageToText
     }
 
 
-    return words_frequency_map_valid.max_by { |k, v| v }[0]
+
+    return {"description" => words_frequency_map_valid.max_by { |k, v| v }[0], "similar_ids" => similar_img_ids}
 
 
 
