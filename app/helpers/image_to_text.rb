@@ -161,7 +161,13 @@ module ImageToText
       most_frequent_adj = adjs.max_by { |k, v| v }
     puts most_frequent_adj
 
-    return {"description" => most_frequent_noun[0], "verb" => most_frequent_verb[0], "adj" => most_frequent_adj[0]}
+
+    most_frequent_verb[0] = "" if most_frequent_verb[1] < 15
+    most_frequent_adj[0] = "" if most_frequent_verb[1] < 6
+
+
+
+    return {"description" => most_frequent_noun[0], "verb" => most_frequent_verb[0], "adj" => most_frequent_adj[0], 'similar_ids' => similar_img_ids}
 
 
     end

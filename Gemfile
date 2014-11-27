@@ -27,6 +27,7 @@ gem 'spring',        group: :development
 gem 'cequel'
 gem 'unirest'
 gem "rspec-rails"
+gem 'engtagger'
 
 
 # Use ActiveModel has_secure_password

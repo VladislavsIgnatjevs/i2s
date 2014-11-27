@@ -1,17 +1,31 @@
 module CacheKnowledge
-  def cache_it_async(img_cache, similar_ids, feedbackID)
+  def cache_image_async(img_cache, similar_ids, feedbackID)
     require 'thread'
     require 'digest/sha1'
 
 
     #Thread.new {
-      cache_it(img_cache,similar_ids, feedbackID)
+      cache_image(img_cache,similar_ids, feedbackID)
+    #}
+  end
+
+  def cache_audio_async(id, blob)
+    require 'thread'
+    require 'digest/sha1'
+    #Thread.new {
+      cache_audio(id,blob)
     #}
   end
 
 
+  def cache_audio (id,blob)
+    require "base64"
+    obj = Voice.new('id' => id, 'voice_blob' => Base64.encode64(blob))
+    obj.save!
+  end
 
-  def cache_it (img_cache,similar_ids, feedbackID)
+
+  def cache_image (img_cache,similar_ids, feedbackID)
 
     obj = Image.new(img_cache)
     obj.save

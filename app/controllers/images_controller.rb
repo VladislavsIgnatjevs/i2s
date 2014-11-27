@@ -7,44 +7,62 @@ class ImagesController < ApplicationController
   def index
 
     require 'unirest'
+    require "base64"
 
 
 
-
+    solution = {}
 
     img_url = params[:imgurl];
     response = Unirest.get 'http://' + img_url
 
 
+    #use cahce if it is possible
     img_hash =  Digest::SHA1.hexdigest response.body
     cached_img = Image.find_by_id(img_hash)
-
     use_cache = false
-
     if (cached_img != nil)&&(use_cache==true)
-      render :text =>cached_img.description
+
+      audio = Voice.find(cached_img.description+","+cached_img.verb+","+cached_img.adj)
+      solution['audio_response'] = Base64.decode64(audio.blob);
     else
 
       #for thesting purposes I pass the whole blob. In the final version we will pass the url of the image for the google.
-      convert_response = convertImageToText(response.body)
+      solution = convertImageToText(response.body)
       feedbackID = SecureRandom.base64(20)
-      cache_it_async({"id" => img_hash,  "description" => convert_response["description"], "verb" => nil, "adj" => nil }, convert_response["similar_ids"], feedbackID)
 
 
-      our_suggestion = getOppinion(convert_response["similar_ids"]);
-      if (our_suggestion[1] > 20)
-        convert_response["description"] = our_suggestion[0]
-      end
 
-      #aresponse = Unirest.get 'http://translate.google.com/translate_tts?tl=en&q='+ construct(convert_response["description"])
 
-      #send_data aresponse.body, :type => 'audio/mpeg',:disposition => 'inline'
-      render :text =>convert_response["description"]
+      #get our learned solution
+      #our_suggestion = getOppinion(solution["similar_ids"]);
+      #if (our_suggestion[1] > 20)
+      #  solution["description"] = our_suggestion[0]
+      #end
+
+      solution["adj"] = "Hello"
+      solution["verb"] = "Hello"
+      solution["description"] = "Hello"
+
+      puts solution["description"]
+      sentence = solution["adj"] +' '+ solution["verb"]+'ing'+ ' ' + solution["description"];
+
+      audio_response = Unirest.get 'http://translate.google.com/translate_tts?tl=en&q='+sentence
+      solution['audio_response'] = audio_response.body
+
+      #cache_image_async({"id" => img_hash,  "description" => solution["description"], "verb" => solution["verb"], "adj" => solution["adj"] }, solution["similar_ids"], feedbackID)
+
+      #cache_audio_async(solution["description"]+","+solution["verb"]+","+solution["adj"], solution["audio_response"])
+
+      #render :text =>convert_response["description"]
+
+
     end
 
 
-
-
+    #render :text =>solution['audio_response']
+    dasds = Unirest.get 'http://translate.google.com/translate_tts?tl=en&q='+'Helo'
+    send_data  dasds.body, :type => 'audio/mpeg',:disposition => 'inline'
 
 
 

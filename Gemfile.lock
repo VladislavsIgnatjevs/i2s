@@ -43,6 +43,7 @@ GEM
     cql-rb (2.0.4)
       ione (~> 1)
     diff-lcs (1.2.5)
+    engtagger (0.2.0)
     erubis (2.7.0)
     execjs (2.2.2)
     hike (1.2.3)
@@ -140,6 +141,7 @@ PLATFORMS
 DEPENDENCIES
   cequel
   coffee-rails (~> 4.0.0)
+  engtagger
   jbuilder (~> 2.0)
   jquery-rails
   rails (= 4.1.8)
