@@ -1,6 +1,6 @@
 #Description of the picture generated using noun with the the sentence around, which according to english
 #language rules has to be with the Indefinite Article + if there is a name(starts with uppercase) then no
-#article will be used.
+#article will be used. Also there is a check of form of the noun(plural or singular)
 
 
 
