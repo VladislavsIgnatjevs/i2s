@@ -20,11 +20,11 @@ class ImagesController < ApplicationController
     #use cahce if it is possible
     img_hash =  Digest::SHA1.hexdigest response.body
     cached_img = Image.find_by_id(img_hash)
-    use_cache = false
+    use_cache = true
     if (cached_img != nil)&&(use_cache==true)
 
       audio = Voice.find(cached_img.description+","+cached_img.verb+","+cached_img.adj)
-      solution['audio_response'] = Base64.decode64(audio.blob);
+      solution['audio_response'] = Base64.decode64(audio.voice_blob);
     else
 
       #for thesting purposes I pass the whole blob. In the final version we will pass the url of the image for the google.
@@ -35,24 +35,22 @@ class ImagesController < ApplicationController
 
 
       #get our learned solution
-      #our_suggestion = getOppinion(solution["similar_ids"]);
-      #if (our_suggestion[1] > 20)
-      #  solution["description"] = our_suggestion[0]
-      #end
+      our_suggestion = getOppinion(solution["similar_ids"]);
+      if (our_suggestion[1] > 20)
+        solution["description"] = our_suggestion[0]
+      end
 
-      solution["adj"] = "Hello"
-      solution["verb"] = "Hello"
-      solution["description"] = "Hello"
 
-      puts solution["description"]
-      sentence = solution["adj"] +' '+ solution["verb"]+'ing'+ ' ' + solution["description"];
+
+      puts solution["adj"]
+      sentence = solution["adj"] +' '+ solution["verb"]+ ' ' + solution["description"];
 
       audio_response = Unirest.get 'http://translate.google.com/translate_tts?tl=en&q='+sentence
       solution['audio_response'] = audio_response.body
 
-      #cache_image_async({"id" => img_hash,  "description" => solution["description"], "verb" => solution["verb"], "adj" => solution["adj"] }, solution["similar_ids"], feedbackID)
+      cache_image_async({"id" => img_hash,  "description" => solution["description"], "verb" => solution["verb"], "adj" => solution["adj"] }, solution["similar_ids"], feedbackID)
 
-      #cache_audio_async(solution["description"]+","+solution["verb"]+","+solution["adj"], solution["audio_response"])
+      cache_audio_async(solution["description"]+","+solution["verb"]+","+solution["adj"], solution["audio_response"])
 
       #render :text =>convert_response["description"]
 
@@ -61,8 +59,8 @@ class ImagesController < ApplicationController
 
 
     #render :text =>solution['audio_response']
-    dasds = Unirest.get 'http://translate.google.com/translate_tts?tl=en&q='+'Helo'
-    send_data  dasds.body, :type => 'audio/mpeg',:disposition => 'inline'
+
+    send_data solution['audio_response'], :type => 'audio/mpeg',:disposition => 'inline'
 
 
 
