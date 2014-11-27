@@ -78,7 +78,7 @@ module DescriptionTextExport
 
       #check if the word starts with vovels and is of singular form
 
-           if @noun.start_with?('a','e','i','o','u') && test_singularity(@noun)==false
+           else if @noun.start_with?('a','e','i','o','u') && test_singularity(@noun)==false
              #output to terminal
              puts "There is an #{@noun} in this picture"
 
