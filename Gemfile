@@ -28,7 +28,11 @@ gem 'cequel'
 gem 'unirest'
 gem "rspec-rails"
 
+# This gem recognises word types and separates them.
+gem 'engtagger'
 
+# This gem translates text into different languages.
+gem "bing_translator", "~> 4.4.0"
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
