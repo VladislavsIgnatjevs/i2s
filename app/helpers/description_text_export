@@ -9,6 +9,9 @@ module DescriptionTextExport
 
   include ImageToText;
   include CacheKnowledge;
+  #module for checking whether to word is of single or plural form
+  require 'active_support/inflector'
+
 
 
 
@@ -17,8 +20,10 @@ module DescriptionTextExport
     #sure this is not working yet
     @noun = text
 
-    #check if the word starts with vovels
-    if @noun.start_with?('a','e','i','o','u')
+#FOR SINGULAR FORM WORDS
+
+    #check if the word starts with vovels and is of singular form
+    if @noun.start_with?('a','e','i','o','u') && test_singularity(@noun)==true
       #output to terminal
       puts "There is an #{@noun} in this picture"
 
@@ -29,8 +34,8 @@ module DescriptionTextExport
 
 
 
-    #check if word starts with consonants and does not contain uppercase letters
-    else if !(@noun.start_with?('a','e','i','o','u','y')) && checkUpper==false
+    #check if word starts with consonants and does not contain uppercase letters and is of singular form
+    else if !(@noun.start_with?('a','e','i','o','u','y')) && checkUpper==false && test_singularity(@noun)==true
 
            #output to terminal
            puts "There is a #{@noun} in this picture"
@@ -40,8 +45,8 @@ module DescriptionTextExport
            @word.update_attributes!(processed_description: "There is a #{@noun} in this picture")
 
 
-    #check if word starts with uppercase vovels
-    else if @noun.start_with?('A','E','I','O','U','Y')
+    #check if word starts with uppercase vovels and is of singular form
+    else if @noun.start_with?('A','E','I','O','U','Y') && test_singularity(@noun)==true
 
            #output to terminal
            puts "There is #{@noun} in this picture"
@@ -49,8 +54,8 @@ module DescriptionTextExport
            @word = Image.find(params[:id])
            @word.update_attributes!(processed_description: "There is #{@noun} in this picture")
 
-    #check if word starts with uppercase consonants
-    else if !(@noun.start_with?('A','E','I','O','U','Y')) && checkUpper==true
+    #check if word starts with uppercase consonants and is of singular form
+    else if !(@noun.start_with?('A','E','I','O','U','Y')) && checkUpper==true && test_singularity(@noun)==true
 
            #output to terminal
            puts "There is #{@noun} in this picture"
@@ -59,14 +64,66 @@ module DescriptionTextExport
            @word.update_attributes!(processed_description: "There is #{@noun} in this picture")
 
 
+      #FOR PLURAL FORM WORDS
+
+      #check if the word starts with vovels and is of singular form
+           if @noun.start_with?('a','e','i','o','u') && test_singularity(@noun)==false
+             #output to terminal
+             puts "There is an #{@noun} in this picture"
+
+             #not sure if works, maybe need to make prepared statement
+             @word = Image.find(params[:id])
+             @word.update_attributes!(processed_description: "There are #{@noun} in this picture")
 
 
-              end
 
+
+          #check if word starts with consonants and does not contain uppercase letters and is of plural form
+           else if !(@noun.start_with?('a','e','i','o','u','y')) && checkUpper==false && test_singularity(@noun)==false
+
+                  #output to terminal
+                  puts "There are #{@noun} are this picture"
+
+                  #not sure if works, maybe need to make prepared statement
+                  @word = Image.find(params[:id])
+                  @word.update_attributes!(processed_description: "There are a #{@noun} in this picture")
+
+
+              #check if word starts with uppercase vovels and is of plural form
+                else if @noun.start_with?('A','E','I','O','U','Y') && test_singularity(@noun)==false
+
+                       #output to terminal
+                       puts "There are #{@noun} in this picture"
+                       #not sure if works, maybe need to make prepared statement
+                       @word = Image.find(params[:id])
+                       @word.update_attributes!(processed_description: "There are #{@noun} in this picture")
+
+                    #check if word starts with uppercase consonants and is of singular form
+                     else if !(@noun.start_with?('A','E','I','O','U','Y')) && checkUpper==true && test_singularity(@noun)==false
+
+                            #output to terminal
+                            puts "There are #{@noun} in this picture"
+                            #not sure if works, maybe need to make prepared statement
+                            @word = Image.find(params[:id])
+                            @word.update_attributes!(processed_description: "There are #{@noun} in this picture")
+
+
+
+
+
+
+                          end
+
+                     end
+                end
+           end
          end
+    end
+
     end
     end
   end
+
 
 
 
@@ -104,6 +161,22 @@ module DescriptionTextExport
 
   def noun_params
     params.require(:noun).permit(:ID)
+  end
+
+#next 3 methods are created to test whether the ford is of plural or singular form. If yes then different
+#articles are used( there are...)
+
+#test if word is singlular
+  def test_singularity(str)
+    str.pluralize != str && str.singularize == str
+  end
+#generate plural form of word
+  def pluralize
+    ActiveSupport::Inflector.pluralize(self)
+  end
+#generate singular form of word
+  def singularize
+    ActiveSupport::Inflector.singularize(self)
   end
 
 end
