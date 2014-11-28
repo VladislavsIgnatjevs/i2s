@@ -28,6 +28,7 @@ gem 'cequel'
 gem 'unirest'
 gem "rspec-rails"
 gem 'engtagger'
+gem 'bing_translator'
 
 
 # Use ActiveModel has_secure_password

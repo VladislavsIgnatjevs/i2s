@@ -52,7 +52,9 @@ module ImageToText
     if guess_index != nil
       guess_pos1 = response.body.index(">", guess_index)+1
       guess_pos2 = response.body.index('</', guess_pos1)
-      #return response.body[guess_pos1,guess_pos2-guess_pos1]
+
+      return {"description" =>response.body[guess_pos1,guess_pos2-guess_pos1], "verb" => "", "adj" => "", 'similar_ids' => []}
+
     end
 
 
@@ -109,8 +111,11 @@ module ImageToText
     data['images'].each do |img|
       similar_img_ids.push(img['id'])
       [img['fn'], img['pt']].each { |str|
-        ['-', 'blue', 'jpg', 'are', 'png', 'gif', '>', '<', '(', ')', '/', '_', ',', '.', '@', '–', '|', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].each { |replacement| str.gsub!(replacement, ' ') }
+
+        ['jpg', 'free', 'are', 'png', 'gif'].each { |replacement| str.gsub!(replacement, ' ') }
+        str.gsub!(/[^A-Za-z]/, '')
         str.gsub!(/[[:upper:]][[:lower:]]/, ' \0') # So awesome I almost cried
+        str.gsub!('ing ', ' ') # So awesome I almost cried
         str.split(' ').each { |word|
           if ((word.downcase != nil)&&(word != '')&&(word != ' ')&&(word.length > 2))
             words += word.downcase + " ";
@@ -127,14 +132,7 @@ module ImageToText
       adjs = tgr.get_adjectives(tagged)
       nouns = tgr.get_nouns(tagged)
 
-      #Sometimes different words should be the same. like 10 room, 5 rooms, 9 bedroom should be 24 room at the end
-      #so I add the appropriate frequencies to the appropriate words.
-=begin nouns.each{|key_1, fequency_1|
-        nouns.each{|key_2, fequency_2|
-          nouns[key_1] += nouns[key_2] if ((key_2.include? key_1))
-        }
-      }
-=end
+
 
     # Add Colours from nouns from adjectives
        nouns.each{|noun, frequency|
@@ -158,12 +156,26 @@ module ImageToText
     puts most_frequent_verb
 
 
+    # !!!!!!!!!We actually dont know whz our program likes word free. And even code on line 115 DOES NOT REMOVE THAT! MAGIC?
+    adjs['free'] = 0;
+
       most_frequent_adj = adjs.max_by { |k, v| v }
     puts most_frequent_adj
 
 
-    most_frequent_verb[0] = "" if most_frequent_verb[1] < 15
-    most_frequent_adj[0] = "" if most_frequent_verb[1] < 6
+
+    else if most_frequent_verb == nil || most_frequent_verb[1] < 6
+       most_frequent_verb = Array.new
+       most_frequent_verb.push('')
+       most_frequent_verb.push(0)
+    end
+
+     if  most_frequent_adj == nil || most_frequent_adj[1] < 4
+           most_frequent_adj = Array.new
+           most_frequent_adj.push('')
+           most_frequent_adj.push(0)
+         end
+
 
 
 

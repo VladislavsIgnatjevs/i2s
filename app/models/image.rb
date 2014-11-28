@@ -6,5 +6,5 @@ class Image
   column :description, :text
   column :verb, :text
   column :adj, :text
-end
 
+end

@@ -15,6 +15,10 @@ class Translation
   end
 
   def translate(text, language)
-    result = @translator.translate text, :from => 'en', :to => language
+    if language != 'en'
+      result = @translator.translate text, :from => 'en', :to => language
+    else
+      return text
+    end
   end
 end
