@@ -20,17 +20,14 @@ class ImagesController < ApplicationController
   end
 
   def create
-    @image = Image.new(image_params)
+    img_url = params[:imgurl];
+    language = params[:lang];
 
-    respond_to do |format|
-      if @image.save
-        format.html { redirect_to @image, notice: 'Image was successfully created.' }
-        format.json { render :show, status: :created, location: @image }
-      else
-        format.html { render :new }
-        format.json { render json: @product.errors, status: :unprocessable_entity }
-      end
-    end
+    #img_url = 'scontent-b-lhr.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1474472_733105713367568_451326057_n.jpg?oh=60affe3c06f32cd8fa914fd83b041e23&oe=5510DE5C'
+    it = ImageTranslator.new(language, img_url)
+    audio = it.main()
+
+    send_data audio, :type => 'audio/mpeg',:disposition => 'inline'
   end
 
   def show
