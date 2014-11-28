@@ -14,7 +14,7 @@ module ImageToText
     #http request. the modification made in the followong file unirest.rb. Can be found where the os
     #stores the gem files
 
-=begin
+=begin Replace these 2 lines of code in the gem 'unirest' by next two
   http_request.add_header("user-agent", Unirest.user_agent)
   http_request.add_header("accept-encoding", "gzip")
 
@@ -29,7 +29,7 @@ module ImageToText
     require 'json'
 
 
-    #sending the image to google. Note th
+    #sending the image to google.
     response = Unirest.post "http://www.google.co.uk/searchbyimage/upload",
                             headers: {"Accept" => "application/json"},
                             parameters: {:encoded_image => File.new("image.jpg", 'rb')}
@@ -115,7 +115,7 @@ module ImageToText
         ['jpg', 'free', 'are', 'png', 'gif'].each { |replacement| str.gsub!(replacement, ' ') }
         str.gsub!(/[^A-Za-z]/, '')
         str.gsub!(/[[:upper:]][[:lower:]]/, ' \0') # So awesome I almost cried
-        str.gsub!('ing ', ' ') # So awesome I almost cried
+        str.gsub!('ing ', ' ')
         str.split(' ').each { |word|
           if ((word.downcase != nil)&&(word != '')&&(word != ' ')&&(word.length > 2))
             words += word.downcase + " ";
@@ -136,7 +136,7 @@ module ImageToText
 
     # Add Colours from nouns from adjectives
        nouns.each{|noun, frequency|
-        if ["white", "black", "red", "yellow", "green", "blue", "green", "pink", "grey", "purple"].include? noun
+        if ["white", "black", "red", "yellow", "green", "blue", "green", "pink", "grey", "purple", "orange"].include? noun
           adjs[noun] = frequency
           nouns[noun] = 0
         end
@@ -183,7 +183,7 @@ module ImageToText
 
 
     end
-
+#/home/ed/Documents/railsworkspace/i2s/app/helpers/image_to_text.rb:185: warning: else without rescue is useless
 
 
 

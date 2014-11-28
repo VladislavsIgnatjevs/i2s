@@ -1,21 +1,19 @@
-
 class ImageTranslator
 
   include ImageToText;
   include CacheKnowledge;
-  include DescriptionTextExport;
 
-  def initialize(l,u)
+  def initialize(l, u)
     @language = l
     @img_url = u
   end
 
-
+  # This method defines basic functionality and calls all the other behaviours to translate image.
   def main()
     require 'unirest'
-    require "base64"
+    require 'base64'
 
-
+    # Creates object of class that is responsible for translation of description to other language.
     translator = Translation.new
 
     solution = {}
@@ -24,14 +22,14 @@ class ImageTranslator
     response = Unirest.get 'http://' + @img_url
 
 
-    #use cahce if it is possible
-    img_hash =  Digest::SHA1.hexdigest response.body
+    # Use cache if it is possible.
+    img_hash = Digest::SHA1.hexdigest response.body
+
+
+
     cached_img = Image.find_by_id(img_hash)
-    use_cache = true
-    if (cached_img != nil)&&(use_cache==true)
-
-
-
+    # use_cache = true         ### We are initially interested in using cache
+    if (cached_img != nil) #&&(use_cache==true)
 
       audio = Voice.find_by_id(cached_img.description+","+cached_img.verb+","+cached_img.adj+","+@language)
 
@@ -43,35 +41,24 @@ class ImageTranslator
         sentence = translator.translate sentence, @language
 
         url = 'http://translate.google.com/translate_tts?tl='+@language+'&q='+sentence
-        solution['audio_response']  = (Unirest.get URI.parse(URI.encode(url)).to_s).body
+        solution['audio_response'] = (Unirest.get URI.parse(URI.encode(url)).to_s).body
         cache_audio_async(cached_img.description+","+cached_img.verb+","+cached_img.adj+","+@language, solution["audio_response"])
       end
 
-
-
-
-
-
-
     else
 
-      #for thesting purposes I pass the whole blob. In the final version we will pass the url of the image for the google.
+      #for testing purposes I pass the whole blob. In the final version we will pass the url of the image for the google.
       solution = convertImageToText(response.body)
       feedbackID = SecureRandom.base64(20)
 
 
-
-
       #get our learned solution
-      our_suggestion = getOppinion(solution["similar_ids"]);
+      our_suggestion = getOppinion(solution["similar_ids"])
       if (our_suggestion[1] > 20)
         solution["description"] = our_suggestion[0]
       end
 
-
-
-      puts solution["adj"]
-      sentence = solution["adj"] +' '+ solution["verb"]+ ' ' + solution["description"];
+      sentence = solution["adj"] +' '+ solution["verb"]+ ' ' + solution["description"]
 
 
       sentence = translator.translate sentence, @language
@@ -83,7 +70,7 @@ class ImageTranslator
       audio_response = Unirest.get URI.parse(URI.encode(url)).to_s
       solution['audio_response'] = audio_response.body
 
-      cache_image_async({"id" => img_hash,  "description" => solution["description"], "verb" => solution["verb"], "adj" => solution["adj"] }, solution["similar_ids"], feedbackID)
+      cache_image_async({"id" => img_hash, "description" => solution["description"], "verb" => solution["verb"], "adj" => solution["adj"]}, solution["similar_ids"], feedbackID)
 
       cache_audio_async(solution["description"]+","+solution["verb"]+","+solution["adj"]+","+@language, solution["audio_response"])
 
@@ -95,7 +82,7 @@ class ImageTranslator
 
     #render :text =>solution['audio_response']
 
-   return solution['audio_response']
+    return solution['audio_response']
   end
 
 end
