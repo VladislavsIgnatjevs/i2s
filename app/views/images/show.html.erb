@@ -1,29 +1,222 @@
-<p id="notice"><%= notice %></p>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Test Music Streaming</title>
+  <meta name="author" content="Eduard Tarassov" />
 
-<p>
-  <strong>Title:</strong>
-  <%= @image.title %>
-</p>
+  <!-- <link rel="icon" type="image/png" href="/img/favicon32.png" /> -->
+  <!--
+  Method stylesheet_link_tag returns a stylesheet link tag for the sources specified as arguments.
+  So you don't need to specify the .css extension.
+  -->
+  <%= stylesheet_link_tag "scaffold", "center-layout",
+                          "/jplayer/jplayer.blue.monday.css" %>
 
-<p>
-  <strong>Description:</strong>
-  <%= @image.description %>
-</p>
 
-<p>
-  <strong>Category:</strong>
-  <%= @image.category %>
-</p>
 
-<p>
-  <strong>Image url:</strong>
-  <%= @image.image_url %>
-</p>
+  <%= javascript_include_tag "application",
+                             "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js",
+                             "/jplayer/jquery.jplayer.min.js",
+                             "/jplayer/demos.common.js",
+                             "visuals"
+  %>
 
-<p>
-  <strong>Voice url:</strong>
-  <%= @image.voice_url%>
-</p>
 
-<%= link_to 'Edit', edit_image_path(@image) %> |
-<%= link_to 'Back', image_path %>
+  <script type="text/javascript">
+
+      $(document).ready(function(){
+
+          $('#enableVisuals').click(function() {
+              var checkBoxVal = $('#enableVisuals:input').attr('checked');
+              if (checkBoxVal === true) {
+                  enableAnimation();
+              } else {
+                  disableAnimation();
+              }
+          });
+
+          var playItem = 0;
+
+          var myPlayList = [
+              <% @voices.each do |voice| %>
+              {name:"<%= voice.id %>",mp3:"<%= voice.voice_blob %>"},
+              <% end %>
+          ];
+
+          // Local copy of jQuery selectors, for performance.
+          var jpPlayTime = $("#jplayer_play_time");
+          var jpTotalTime = $("#jplayer_total_time");
+          var jpStatus = $("#demo_status"); // For displaying information about jPlayer's status in the demo page
+
+          $("#jquery_jplayer").jPlayer({
+              ready: function() {
+                  displayPlayList();
+                  playListInit(false); // Parameter is a boolean for autoplay.
+                  demoInstanceInfo(this.element, $("#demo_info")); // This displays information about jPlayer's configuration in the demo page
+              },
+              oggSupport: true
+          })
+                  .jPlayer("onProgressChange", function(loadPercent, playedPercentRelative, playedPercentAbsolute, playedTime, totalTime) {
+                      jpPlayTime.text($.jPlayer.convertTime(playedTime));
+                      jpTotalTime.text($.jPlayer.convertTime(totalTime));
+
+                      demoStatusInfo(this.element, jpStatus); // This displays information about jPlayer's status in the demo page
+                      draw(loadPercent, playedPercentRelative, playedPercentAbsolute, playedTime, totalTime);
+                  })
+                  .jPlayer("onSoundComplete", function() {
+                      playListNext();
+                  });
+
+          $("#jplayer_play").click( function() {
+              resumeAnimation();
+              $(this).play();
+              return false;
+          });
+
+          $("#jplayer_pause").click( function() {
+              pauseAnimation();
+              $(this).pause();
+              return false;
+          });
+
+          $("#jplayer_stop").click( function() {
+              stopAnimation();
+              $(this).stop();
+              return false;
+          });
+
+          $("#jplayer_previous").click( function() {
+              playListPrev();
+              $(this).blur();
+              return false;
+          });
+
+          $("#jplayer_next").click( function() {
+              playListNext();
+              $(this).blur();
+              return false;
+          });
+
+          function displayPlayList() {
+              $("#jplayer_playlist ul").empty();
+              $("#jplayer_playlist_downloads ul").empty();
+              for (i=0; i < myPlayList.length; i++) {
+                  var listItem = (i == myPlayList.length-1) ? "<li class='jplayer_playlist_item_last'>" : "<li>";
+                  listItem += "<a href='#' id='jplayer_playlist_item_"+i+"' tabindex='1'>"+ myPlayList[i].name +"</a>";
+                  var downloadItem = (i == myPlayList.length-1) ? "<li class='jplayer_playlist_item_last'>" : "<li>";
+                  downloadItem += "(<a href='" + myPlayList[i].mp3 + "'>MP3</a>) ";
+                  downloadItem += "(<a href='" + myPlayList[i].ogg + "'>OGG</a>)";
+                  $("#jplayer_playlist ul").append(listItem);
+                  $("#jplayer_playlist_downloads ul").append(downloadItem);
+                  $("#jplayer_playlist_item_"+i).data( "index", i ).click( function() {
+                      var index = $(this).data("index");
+                      if (playItem != index) {
+                          playListChange( index );
+                      } else {
+                          $("#jquery_jplayer").jPlayer("play");
+                      }
+                      $(this).blur();
+                      return false;
+                  });
+              }
+          }
+
+          function playListInit(autoplay) {
+              if(autoplay) {
+                  playListChange( playItem );
+              } else {
+                  playListConfig( playItem );
+              }
+          }
+
+          function playListConfig( index ) {
+              $("#jplayer_playlist_item_"+playItem).removeClass("jplayer_playlist_current").parent().removeClass("jplayer_playlist_current");
+              $("#jplayer_playlist_item_"+index).addClass("jplayer_playlist_current").parent().addClass("jplayer_playlist_current");
+              playItem = index;
+              $("#jquery_jplayer").jPlayer("setFile", myPlayList[playItem].mp3, myPlayList[playItem].ogg);
+          }
+
+          function playListChange( index ) {
+              playListConfig( index );
+              $("#jquery_jplayer").jPlayer("play");
+              resumeAnimation();
+          }
+
+          function playListNext() {
+              var index = (playItem+1 < myPlayList.length) ? playItem+1 : 0;
+              playListChange( index );
+          }
+
+          function playListPrev() {
+              var index = (playItem-1 >= 0) ? playItem-1 : myPlayList.length-1;
+              playListChange( index );
+          }
+
+          /* Visualizations */
+//    initAnimation();
+      });
+  </script>
+</head>
+<body>
+<div id="content">
+  <div id="header">
+    <h1>Test Music Streaming</h1>
+  </div>
+  <div id="jquery_jplayer"></div>
+
+  <div class="jp-playlist-player">
+    <div class="jp-interface">
+      <ul class="jp-controls">
+        <li><a href="#" id="jplayer_play" class="jp-play" tabindex="1">play</a></li>
+
+        <li><a href="#" id="jplayer_pause" class="jp-pause" tabindex="1">pause</a></li>
+        <li><a href="#" id="jplayer_stop" class="jp-stop" tabindex="1">stop</a></li>
+        <li><a href="#" id="jplayer_volume_min" class="jp-volume-min" tabindex="1">min volume</a></li>
+        <li><a href="#" id="jplayer_volume_max" class="jp-volume-max" tabindex="1">max volume</a></li>
+        <li><a href="#" id="jplayer_previous" class="jp-previous" tabindex="1">previous</a></li>
+        <li><a href="#" id="jplayer_next" class="jp-next" tabindex="1">next</a></li>
+
+      </ul>
+      <div class="jp-progress">
+        <div id="jplayer_load_bar" class="jp-load-bar">
+          <div id="jplayer_play_bar" class="jp-play-bar"></div>
+        </div>
+      </div>
+      <div id="jplayer_volume_bar" class="jp-volume-bar">
+        <div id="jplayer_volume_bar_value" class="jp-volume-bar-value"></div>
+      </div>
+
+      <div id="jplayer_play_time" class="jp-play-time"></div>
+      <div id="jplayer_total_time" class="jp-total-time"></div>
+    </div>
+    <div id="jplayer_playlist" class="jp-playlist">
+      <ul>
+        <!-- The function displayPlayList() uses this unordered list -->
+        <!-- <li><a href="/browser_failure">Did not work in your browser, please click here!</a></li>-->
+      </ul>
+    </div>
+    <div id="jplayer_playlist_downloads" class="jp-downloads">
+      <ul>
+        <li>(MP3) (OGG)</li>
+        <li>(MP3) (OGG)</li>
+        <li>(MP3) (OGG)</li>
+      </ul>
+    </div>
+  </div>
+  <div id="visualEnabler">
+    <form action="#">
+      <input type="checkbox"
+             id="enableVisuals" name="enableVisuals"/>Visuals
+    </form>
+  </div>
+  <div id="footer">
+    <!-- HERE WAS SOME FOOTER AUTHOR INFORMATION -->
+  </div>
+</div>
+<br/>
+<div id="visualization">
+  <canvas id="c" width="400" height="400"></canvas>
+</div>
+</body>
+</html>
