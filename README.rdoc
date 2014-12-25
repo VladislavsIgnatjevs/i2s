@@ -1,28 +1,16 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is Image2Speech (I2S) webservice which purpose is to provide full speech 
+translation of any image (internet connection required). Image2Speech 
+searches for all the similar images in Google and helps sorts their 
+titles/descriptions into description of the your selected image.
+Also I2S provides translation into speech in other languages.
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+Service consists of two connected things:
+  # business logic and the actual translation of the image is provided by Ruby on Rails 4 app
+  # and interaction with the user is provided by Chrome Extension 
+    (Can be found in the Rails app root folder as ChromeExt).
+    
+Installation process:
+1. Download .zip from the 
+  
