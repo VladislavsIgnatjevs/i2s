@@ -1,0 +1,33 @@
+{
+  "manifest_version": 2,
+
+  "name": "Image To Speech",
+  "description": "This extension assists people with visual impairment , by translating the image to Audio.",
+  "icons": {
+        "48": "text-to-speech.png",
+        "128": "text-to-speech.png"
+    },
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "text-to-speech.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "cookies",
+    "http://*/*",
+    "https://*/*",
+	"http://127.0.0.1:3000/*"
+  ],
+  
+ "content_scripts": [
+    {
+      // Change 'matches' attribute to load content
+      // script only in pages you want to.
+      "matches": ["<all_urls>"],
+      "css": ["basic.css"],
+      "js": ["jquery.min.js", "contentscript.js", "jplayer/jquery.jplayer.min.js"]
+
+    }
+  ]
+}
