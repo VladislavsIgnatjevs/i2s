@@ -4,13 +4,44 @@ This is Image2Speech (I2S) webservice which purpose is to provide full speech
 translation of any image (internet connection required). Image2Speech 
 searches for all the similar images in Google and helps sorts their 
 titles/descriptions into description of the your selected image.
-Also I2S provides translation into speech in other languages.
+Also I2S provides translation into speech in other languages 
+(with the help of Bing).
 
 Service consists of two connected things:
-  # business logic and the actual translation of the image is provided by Ruby on Rails 4 app
-  # and interaction with the user is provided by Chrome Extension 
-    (Can be found in the Rails app root folder as ChromeExt).
+  1. business logic and the actual translation of the image is provided by Ruby on Rails 4 app
+  2. and interaction with the user is provided by Chrome Extension 
+    
     
 Installation process:
-1. Download .zip from the 
+  1. Download .zip of the project from the GitHub.
+  2. Import Rails 4 project with your favourite text editor or IDE (we used RubyMine 6.3)
+  3. Turn on your Cassandra database
+  4. We are using different gems like (cequel for Cassandra and unirest for web scraping). 
+  So don't forget to install those in your project (use "bundle install" command).
+  5. We have changed Unirest Gem a little to make it appropriate to our program.
+  So you need to do next steps:
+    5.1. Find Unirest Gem location on your computer. (Use "gem env" command)
+    5.2. Go to Unirest lib folder. And edit unirest.rb file.
+        Replace these 2 lines of code in the gem 'unirest' by next two:
+             http_request.add_header("user-agent", Unirest.user_agent)
+             http_request.add_header("accept-encoding", "gzip")
+
+             http_request.add_header("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36")
+             http_request.add_header("accept-encoding", "gzip, deflate"
+  6. Don't forget to create appropriate keyspace in your Cassandra Database. And import tables from the Rails application.
+  7. Now you need to install Chrome Extension.
+      Go to chrome->settings->extensions(check developer mode)->load unpacked extension->select the folder.
+      (Can be found in the Rails app root folder as ChromeExt).
+  8. Run your Rails project and Chrome Extension.
+  9. Now you can navigate to different images using tab button and translate 
+  those into different languages using buttons on your keyboard (b,t,...).
   
+  Hope you will enjoy. If you will have trouble with installation or want to give us some recommendations,
+  I will be glad to conversate to you. eduardtarassov@gmail.com
+  
+  Project is written by:
+      Eduard Tarassov
+      Tamas Suveges
+      Andrew Vasilyev
+      Vladislavs Ignatjevs
+      
